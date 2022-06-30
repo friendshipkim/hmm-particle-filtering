@@ -1,0 +1,5 @@
+torch
+flake8
+black
+pytest
+hypothesis
