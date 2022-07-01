@@ -69,7 +69,7 @@ class HMM:
         
         for i in range(T):
             # Reweighting
-            # obs_z: shape: B x Y, type - [0, 1]
+            # obs_z: shape - B x Y, type - [0, 1]
             obs_z = self.observation[z]
 
             # dist: B different categorical dist'ns over Y values
@@ -81,10 +81,9 @@ class HMM:
             # log_p_y: shape - B, type - [0, 1], p(y_i=y[i]|z_i^b)
             log_p_y = dist.log_prob(y_particles)
             
-            
             # Resampling
-            # zs_to_keep: shape: (B,), {1,...,Z}
-            zs_to_keep = Categorical(log_p_y).sample((B,))  # draw B samples from range(B), logits are given from the observations
+            # zs_to_keep: shape - B, type - range(Z)
+            zs_to_keep = Categorical(logits=log_p_y).sample((B,))  # draw B samples from range(B), logits are given from the observations
             
             z = z[zs_to_keep]  # map back to the observations (range(B)) 
             zs[:, i] = z
@@ -105,6 +104,7 @@ class HMM:
                 marginals[t, j] = (z_samples[:, t] == j).sum(0) / B
 
         return marginals
+
 
     def marginals(self, z_samples: torch.Tensor) -> torch.Tensor:
         """
