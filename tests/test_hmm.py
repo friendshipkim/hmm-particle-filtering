@@ -7,7 +7,7 @@ def test_marginal():
 
     B = 100  # batch_size
     T = 10  # time-step
-    
+
     hmm = HMM(Z, Y)
 
     z_samples = hmm.sample(B, T)[..., 1]

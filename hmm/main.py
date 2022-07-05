@@ -29,7 +29,7 @@ def enumeration(N: int, hmm: Type[HMM]):
     Returns:
         _type_: _description_
     """
-    Z, Y = hmm.Z, hmm.Y
+    # Z, Y = hmm.Z, hmm.Y
 
     # ====== sample y and zs
     sampled_y_and_zs = hmm.sample(N, T)
@@ -69,7 +69,7 @@ def enumeration(N: int, hmm: Type[HMM]):
 
         # z_correct_prob: shape - 1, type - [0, 1]
         # TODO: change to log prob
-        z_correct_prob = torch.prod(z_correct_probs)
+        z_correct_prob = torch.prod(z_correct_probs)  # noqa
 
     # ====== probs of z_pool
 
@@ -86,7 +86,7 @@ def enumeration(N: int, hmm: Type[HMM]):
         return z_probs
 
     # z_probs: shape - N_uniq, type - [0, 1]
-    z_probs = z_probs_scalar(z_pool)
+    z_probs = z_probs_scalar(z_pool)  # noqa
     # ISSUE: low prob, try sampling without replacement?
     print(z_probs_scalar(z_pool).sum())
 
