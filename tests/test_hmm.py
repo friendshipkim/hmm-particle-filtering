@@ -16,6 +16,3 @@ def test_marginal():
     marginals = hmm.marginals_scalar(z_samples)
     marginals2 = hmm.marginals(z_samples)
     torch.testing.assert_close(marginals, marginals2)
-
-if __name__ == '__main__':
-    test_marginal()
