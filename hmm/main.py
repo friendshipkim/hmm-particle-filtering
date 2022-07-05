@@ -1,6 +1,7 @@
 import torch
 from typing import Type
 from hmm.model import HMM
+
 # import matplotlib.pyplot as plt
 
 Cat = torch.distributions.Categorical
@@ -12,7 +13,13 @@ B = 1000  # batch_size
 T = 10  # time-step
 
 
-def mc_approximation(true_z: torch.LongTensor):
+def mc_approximation(true_z: torch.LongTensor, hmm: Type[HMM]):
+    # sampled_ys: shape - B x T, type - range(Y)
+    sampled_ys = hmm.likelihood_sample(B, true_z)
+
+    # observations: shape - T x B
+    observations = sampled_ys.T
+    breakpoint()
     pass
 
 
@@ -45,8 +52,10 @@ def enumeration(N: int, hmm: Type[HMM]):
     z_pool, mapping = torch.unique(sampled_zs, dim=0, return_inverse=True)
     N_uniq = z_pool.shape[0]
 
+    # TODO: no need to sample one observation, do mc sampling for each z
     # onehot_mapping: shape - N x N_uniq, type - {0, 1}
     onehot_mapping = torch.nn.functional.one_hot(mapping, N_uniq)
+    torch.bincount()
 
     # sample one ys from each z in z_pool
     # uniq_ys: shape - N_uniq, type - range(N)
@@ -58,7 +67,7 @@ def enumeration(N: int, hmm: Type[HMM]):
     # ====== posterior_marginal
     for z, y in zip(z_pool, y_pool):
         # posterior_zs: shape - B x T, type - range(Z)
-        posterior_zs = hmm.posterior_sample(B, T, y)
+        posterior_zs = hmm.posterior_sample(B, y)
 
         # posterior_marginals: shape - T x Z, type - [0, 1]
         # posterior_marginals[t, j] = p(z_t = j | y_{1:t-1})
@@ -70,6 +79,8 @@ def enumeration(N: int, hmm: Type[HMM]):
         # z_correct_prob: shape - 1, type - [0, 1]
         # TODO: change to log prob
         z_correct_prob = torch.prod(z_correct_probs)  # noqa
+
+        breakpoint()
 
     # ====== probs of z_pool
 
@@ -119,9 +130,15 @@ if __name__ == "__main__":
     # # y: shape - T, type - range(Y)
     # y = torch.randint(Y, (T,))
     # y = torch.zeros(T)
-    # posterior_zs = hmm.posterior_sample(B, T, y)
+    # posterior_zs = hmm.posterior_sample(B, y)
     # posterior_marginals = hmm.marginals(posterior_zs)
 
+    # monte carlo
+    true_z = torch.zeros(T).long()
+    mc_approximation(true_z, hmm)
+    exit()
+
+    # enumeration
     N = 1000
     enumeration(N, hmm)
 

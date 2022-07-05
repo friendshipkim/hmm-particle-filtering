@@ -55,18 +55,43 @@ class HMM:
             z = Categorical(probs=self.transition[z]).sample()
         return y_and_zs
 
-    def posterior_sample(self, B: int, T: int, y: torch.Tensor) -> torch.Tensor:
+    def likelihood_sample(self, B: int, true_z: torch.Tensor) -> torch.Tensor:
+        """
+        # TODO: naming?
+        sample ys, given true zs
+
+        Args:
+            B (int): batch size
+            true_z (torch.Tensor): true zs, shape - T, type - range(Z)
+
+        Returns:
+            torch.Tensor: sampled ys, shape - B x T, type - range(Y)
+        """
+        T = len(true_z)
+        ys = torch.zeros(B, T).long()
+
+        for i in range(T):
+            # z: shape - 1, type - range(Z)
+            z = true_z[i]
+
+            # y: shape - B, type - range(Y)
+            y = Categorical(probs=self.observation[z]).sample((B,))
+
+            ys[:, i] = y
+        return ys
+
+    def posterior_sample(self, B: int, y: torch.Tensor) -> torch.Tensor:
         """
         sample zs, given the history y
 
         Args:
             B (int): batch size
-            T (int): # of time step
-            y (torch.Tensor): observation history, shape - T, type - range(Y)
+            y (torch.Tensor): observation history of T time steps, shape - T, type - range(Y)
 
         Returns:
             torch.Tensor: sampled zs, shape - B x T, type - range(Z)
         """
+        T = len(y)
         zs = torch.zeros(B, T).long()
 
         # z: shape - B, type - range(Z)
