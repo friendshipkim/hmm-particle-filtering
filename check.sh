@@ -1,2 +1,2 @@
-black fastalign/
-flake8 fastalign/
+black hmm/
+flake8 hmm/
